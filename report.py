@@ -61,9 +61,9 @@ def generate_unique(DATABASE, cpm, date_range=None):
     with first_page.create(Head("R")) as header_right:
         with header_right.create(MiniPage(width=NoEscape(r'0.49\textwidth'), pos='c', align='r')) as wrapper_right:
             wrapper_right.append(LargeText(bold('JB TECNICS')))
-            wrapper_right.append(LineBreak())
+            wrapper_right.append(NoEscape(r'\par'))
             wrapper_right.append(MediumText(bold('Molinges')))
-            wrapper_right.append(LineBreak())
+            wrapper_right.append(NoEscape(r'\par'))
             
             mois = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
             now = datetime.now()
@@ -98,12 +98,11 @@ def generate_unique(DATABASE, cpm, date_range=None):
         not_picked_up = 0
 
     doc.append(LargeText(bold('Résumé des statistiques')))
-    doc.append(LineBreak())
+    doc.append(NoEscape(r'\par\vspace{0.2cm}'))
     doc.append(f"Clics totaux : {total_clicks}")
-    doc.append(LineBreak())
+    doc.append(NoEscape(r'\par\vspace{0.1cm}'))
     doc.append(f"Visiteurs non capturés : {not_picked_up}")
-    doc.append(LineBreak())
-    doc.append(LineBreak())
+    doc.append(NoEscape(r'\par\vspace{0.5cm}'))
 
     with doc.create(LongTabu("X[15l]", row_height=1.8)) as data_table:
         data_table.add_row(["Informations de capture\n"], mapper=bold, color="lightgray")
