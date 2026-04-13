@@ -87,7 +87,8 @@ def generate_unique(DATABASE, cpm, date_range=None):
     doc.change_document_style("firstpage")
     doc.add_color(name="lightgray", model="gray", description="0.80")
 
-    with doc.create(LongTabu("X[2l] X[2l] X[3l]", row_height=1.5)) as data_table:
+    # Remplacement des largeurs de colonnes problématiques par des tailles égales X[l]
+    with doc.create(LongTabu("X[l] X[l] X[l]", row_height=1.5)) as data_table:
         data_table.add_row(["Organisation", "IP", "Email"], mapper=bold, color="lightgray")
         data_table.add_empty_row()
         data_table.add_hline()
