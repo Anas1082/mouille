@@ -62,8 +62,8 @@ def generate_unique(DATABASE, cpm, date_range=None):
     doc.change_document_style("firstpage")
     doc.add_color(name="lightgray", model="gray", description="0.80")
 
-    with doc.create(LongTabu("X[15l]", row_height=1.8)) as data_table:
-        data_table.add_row(["Organisation\nIP de capture\nDonnées capturées\n"], mapper=bold, color="lightgray")
+    with doc.create(LongTabu("X[l] X[l] X[l]", row_height=1.5)) as data_table:
+        data_table.add_row(["Organisation", "IP", "Email"], mapper=bold, color="lightgray")
         data_table.add_empty_row()
         data_table.add_hline()
 
@@ -79,30 +79,24 @@ def generate_unique(DATABASE, cpm, date_range=None):
             
             ip = str(row[7])
             
+            email_found = "Non trouvé"
             try:
                 log_dict = literal_eval(row[2])
                 if type(log_dict) is dict:
-                    log_dict.pop('skstamp', None)
-                    log_dict.pop('utf8', None)
-                    
-                    keys_to_remove = [k for k in log_dict.keys() if 'pass' in k.lower() or 'pwd' in k.lower() or 'mdp' in k.lower()]
-                    for k in keys_to_remove:
-                        log_dict.pop(k, None)
-                        
-                    log_str = ", ".join([f"{k}: {v}" for k, v in log_dict.items()])
-                    if not log_str:
-                        log_str = "Aucun identifiant trouvé"
-                else:
-                    log_str = str(row[2])
+                    possible_keys = ['email', 'login', 'user', 'username', 'loginfmt']
+                    for key, value in log_dict.items():
+                        if any(pk in key.lower() for pk in possible_keys):
+                            email_found = str(value)
+                            break
             except Exception:
-                log_str = "N/A"
+                pass
 
-            row_tex = [url + '\n' + ip + '\n' + log_str + '\n']
+            row_data = [url, ip, email_found]
 
             if (i % 2) == 0:
-                data_table.add_row(row_tex, color="lightgray")
+                data_table.add_row(row_data, color="lightgray")
             else:
-                data_table.add_row(row_tex)
+                data_table.add_row(row_data)
 
     doc.append(NewPage())
     
