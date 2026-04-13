@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="SocialFish">
+    <meta name="author" content="UndeadSec">
+    <meta name="keywords" content="SocialFish">
+
+    <title>SocialFish Neptune</title>
+
+    <link href="/css/font-face.css" rel="stylesheet" media="all">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+    <link href="/vendor/bootstrap-4.1/bootstrap.min.css" rel="stylesheet" media="all">
+    <link href="/css/theme.css" rel="stylesheet" media="all">
+
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+</head>
+<body>
+    <br>
+    <div class="container">
+    <div class="card">
+        <div class="card-header">
+            <a href="/creds"><i class="fas fa-arrow-left"></i> <strong>SocialFish</strong></a> / Générer un rapport
+        </div>
+        <div class="card-body card-block">
+            <form action="/report" method="POST" class="form-horizontal" target="_blank">            
+                
+                <input type="hidden" name="subject" value="Rapport SocialFish">
+                <input type="hidden" name="selectUser" value="N/A">
+                <input type="hidden" name="selectCompany" value="N/A">
+
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="text-input" class="form-control-label">Plage de dates</label>                        
+                    </div>
+                    <div class="col-12 col-md-9">                        
+                        <input type="text" name="datefilter" value="" class="form-control" placeholder="MM/JJ/AAAA" required="" />     
+                        <small class="form-text text-muted"><i class="fa fa-calendar"></i>&nbsp; Veuillez sélectionner une plage de dates</small>                
+                    </div>
+                </div>                
+                <div class="row form-group">
+                    <div class="col col-md-3">
+                        <label for="select" class=" form-control-label">Cible(s)</label>
+                    </div>
+                    <div class="col-12 col-md-9">
+                        <select name="selectTarget" id="selectTarget" class="form-control" required="">
+                            <option value="0">Toutes</option>
+                            {% for u in uniqueUrls %} 
+                            <option value="{{ u }}">{{ u }}</option>
+                            {% endfor %} 
+                        </select>
+                    </div>
+                </div>          
+                <div class="card-footer" style="text-align: right;">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="fa fa-dot-circle-o"></i> Générer
+                    </button>
+                </div>
+            </form>
+        </div>        
+    </div>
+    </div>
+
+    <script src="/vendor/jquery-3.2.1.min.js"></script>
+    <script src="/vendor/bootstrap-4.1/popper.min.js"></script>
+    <script src="/vendor/bootstrap-4.1/bootstrap.min.js"></script>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+
+<script type="text/javascript">
+$(function() {
+
+  $('input[name="datefilter"]').daterangepicker({
+      autoUpdateInput: false,
+      locale: {
+          cancelLabel: 'Annuler',
+          applyLabel: 'Appliquer',
+          daysOfWeek: ['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'],
+          monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre']
+      }
+  });
+
+  $('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
+      $(this).val(picker.startDate.format('MM/DD/YYYY') + ' _ ' + picker.endDate.format('MM/DD/YYYY'));
+  });
+
+  $('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
+      $(this).val('');
+  });
+
+});
+</script>
+</body>
+</html>
