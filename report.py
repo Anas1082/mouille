@@ -152,8 +152,16 @@ def generate_unique(DATABASE, cpm, date_range=None):
     if not os.path.exists(static_folder):
         os.makedirs(static_folder)
 
+    doc.generate_tex(pdf_path_no_ext)
+    
     try:
-        doc.generate_pdf(pdf_path_no_ext, clean_tex=False)
+        subprocess.run(
+            ['pdflatex', '-interaction=nonstopmode', f'{pdf_name}.tex'],
+            cwd=static_folder,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            check=True
+        )
     except subprocess.CalledProcessError:
         pass
         
