@@ -8,12 +8,24 @@ from sqlite3 import connect
 from ast import literal_eval
 from datetime import datetime
 
-def generate_report(DATABASE, cpm):
+def generate_report(DATABASE, cpm, date_range):
     conex = connect(DATABASE)
     cursor = conex.cursor()
-    _cURL = cpm
-    choose_url = 'http' if _cURL == 'All' else _cURL
-    result_query = cursor.execute('SELECT * FROM creds WHERE url GLOB "*{}*"'.format(choose_url)).fetchall()
+    
+    # Traitement de la date pour correspondre au format de la base de données (MM-DD-YYYY)
+    dr = date_range.replace(' ', '').replace('/', '-').split('_')
+    date_start = dr[0]
+    date_end = dr[1]
+    
+    if cpm == 'All':
+        # Sélectionne tout si la cible est "All", filtré par date
+        query = "SELECT * FROM creds WHERE pdate BETWEEN ? AND ?"
+        result_query = cursor.execute(query, (date_start, date_end)).fetchall()
+    else:
+        # Filtrage par URL spécifique et par date
+        query = "SELECT * FROM creds WHERE url GLOB ? AND pdate BETWEEN ? AND ?"
+        result_query = cursor.execute(query, (f"*{cpm}*", date_start, date_end)).fetchall()
+        
     result_count = len(result_query)
     return result_query, result_count
 
@@ -62,28 +74,27 @@ def generate_unique(DATABASE, cpm, date_range=None):
     doc.change_document_style("firstpage")
     doc.add_color(name="lightgray", model="gray", description="0.80")
 
-    with doc.create(LongTabu("X[l] X[l] X[l]", row_height=1.5)) as data_table:
+    with doc.create(LongTabu("X[2l] X[2l] X[3l]", row_height=1.5)) as data_table:
         data_table.add_row(["Organisation", "IP", "Email"], mapper=bold, color="lightgray")
         data_table.add_empty_row()
         data_table.add_hline()
 
-        result_query, result_count = generate_report(DATABASE, cpm)
+        result_query, result_count = generate_report(DATABASE, cpm, date_range)
 
         for i in range(result_count):
             row = result_query[i]
-            try:
-                url_parts = row[1].split('//')
-                url = url_parts[1] if len(url_parts) > 1 else row[1]
-            except Exception:
-                url = str(row[1])
             
+            # Nettoyage de l'URL
+            url = str(row[1]).replace('http://', '').replace('https://', '')
             ip = str(row[7])
             
+            # Extraction de l'e-mail uniquement
             email_found = "Non trouvé"
             try:
                 log_dict = literal_eval(row[2])
-                if type(log_dict) is dict:
-                    possible_keys = ['email', 'login', 'user', 'username', 'loginfmt']
+                if isinstance(log_dict, dict):
+                    # Liste des clés communes pour l'identifiant
+                    possible_keys = ['email', 'login', 'user', 'username', 'loginfmt', 'm_login_email']
                     for key, value in log_dict.items():
                         if any(pk in key.lower() for pk in possible_keys):
                             email_found = str(value)
@@ -104,8 +115,7 @@ def generate_unique(DATABASE, cpm, date_range=None):
         safe_date = date_range.replace('/', '-').replace(' - ', '_').replace(' ', '')
         pdf_name = f'Rapport_{safe_date}'
     else:
-        now_str = now.strftime('%y%m')
-        pdf_name = f'Rapport-{now_str}'
+        pdf_name = f"Rapport_{datetime.now().strftime('%y%m')}"
 
     static_folder = os.path.join(os.getcwd(), 'templates', 'static')
     pdf_path_no_ext = os.path.join(static_folder, pdf_name)
