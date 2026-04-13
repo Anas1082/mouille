@@ -1,4 +1,5 @@
 import os
+import subprocess
 from pylatex import Document, PageStyle, Head, Foot, MiniPage, \
     StandAloneGraphic, MultiColumn, Tabu, LongTabu, LargeText, MediumText, \
     LineBreak, NewPage, Tabularx, TextColor, simple_page_number, Command
@@ -88,7 +89,11 @@ def generate_unique(DATABASE, cpm):
 
     doc.append(NewPage())
     pdf_name = 'Rapport{}'.format(strftime('-%y%m'))
-    doc.generate_pdf(pdf_name, clean_tex=False)
+    
+    try:
+        doc.generate_pdf(pdf_name, clean_tex=False)
+    except subprocess.CalledProcessError:
+        pass
     
     pdf_path = os.path.join(os.getcwd(), pdf_name + '.pdf')
     if os.path.exists(pdf_path):
