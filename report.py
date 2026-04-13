@@ -8,11 +8,6 @@ from sqlite3 import connect
 from ast import literal_eval
 from datetime import datetime
 
-def wrap_text(text, width):
-    if not text: return ""
-    text = str(text)
-    return '\n'.join([text[i:i+width] for i in range(0, len(text), width)])
-
 def generate_report(DATABASE, cpm, date_range):
     conex = connect(DATABASE)
     cursor = conex.cursor()
@@ -92,8 +87,8 @@ def generate_unique(DATABASE, cpm, date_range=None):
     doc.change_document_style("firstpage")
     doc.add_color(name="lightgray", model="gray", description="0.80")
 
-    with doc.create(LongTabu("X[1l] X[1l] X[2l]", row_height=1.5)) as data_table:
-        data_table.add_row(["Organisation", "IP", "Email"], mapper=bold, color="lightgray")
+    with doc.create(LongTabu("X[15l]", row_height=1.8)) as data_table:
+        data_table.add_row(["Informations de capture\n"], mapper=bold, color="lightgray")
         data_table.add_empty_row()
         data_table.add_hline()
 
@@ -118,15 +113,12 @@ def generate_unique(DATABASE, cpm, date_range=None):
             except Exception:
                 pass
 
-            url = wrap_text(url, 25)
-            email_found = wrap_text(email_found, 40)
-
-            row_data = [url, ip, email_found]
+            row_tex = [f"Organisation: {url}\nIP: {ip}\nEmail: {email_found}\n"]
 
             if (i % 2) == 0:
-                data_table.add_row(row_data, color="lightgray")
+                data_table.add_row(row_tex, color="lightgray")
             else:
-                data_table.add_row(row_data)
+                data_table.add_row(row_tex)
 
     doc.append(NewPage())
     
