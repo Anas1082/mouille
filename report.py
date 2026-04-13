@@ -12,22 +12,35 @@ def generate_report(DATABASE, cpm, date_range):
     conex = connect(DATABASE)
     cursor = conex.cursor()
     
-    # Traitement de la date pour correspondre au format de la base de données (MM-DD-YYYY)
-    dr = date_range.replace(' ', '').replace('/', '-').split('_')
-    date_start = dr[0]
-    date_end = dr[1]
+    all_creds = cursor.execute('SELECT * FROM creds').fetchall()
     
-    if cpm == 'All':
-        # Sélectionne tout si la cible est "All", filtré par date
-        query = "SELECT * FROM creds WHERE pdate BETWEEN ? AND ?"
-        result_query = cursor.execute(query, (date_start, date_end)).fetchall()
-    else:
-        # Filtrage par URL spécifique et par date
-        query = "SELECT * FROM creds WHERE url GLOB ? AND pdate BETWEEN ? AND ?"
-        result_query = cursor.execute(query, (f"*{cpm}*", date_start, date_end)).fetchall()
+    try:
+        dr = date_range.replace(' ', '').split('_')
+        start_date = datetime.strptime(dr[0], '%m/%d/%Y')
+        end_date = datetime.strptime(dr[1], '%m/%d/%Y')
+        filter_by_date = True
+    except Exception:
+        filter_by_date = False
+
+    filtered_query = []
+    for row in all_creds:
+        url_db = str(row[1])
+        date_db_str = str(row[3])
         
-    result_count = len(result_query)
-    return result_query, result_count
+        if cpm != 'All' and cpm not in url_db:
+            continue
+            
+        if filter_by_date:
+            try:
+                row_date = datetime.strptime(date_db_str, '%m-%d-%Y')
+                if not (start_date <= row_date <= end_date):
+                    continue
+            except Exception:
+                pass
+                
+        filtered_query.append(row)
+
+    return filtered_query, len(filtered_query)
 
 def generate_unique(DATABASE, cpm, date_range=None):
     geometry_options = {
@@ -84,21 +97,19 @@ def generate_unique(DATABASE, cpm, date_range=None):
         for i in range(result_count):
             row = result_query[i]
             
-            # Nettoyage de l'URL
             url = str(row[1]).replace('http://', '').replace('https://', '')
             ip = str(row[7])
             
-            # Extraction de l'e-mail uniquement
             email_found = "Non trouvé"
             try:
                 log_dict = literal_eval(row[2])
                 if isinstance(log_dict, dict):
-                    # Liste des clés communes pour l'identifiant
                     possible_keys = ['email', 'login', 'user', 'username', 'loginfmt', 'm_login_email']
                     for key, value in log_dict.items():
                         if any(pk in key.lower() for pk in possible_keys):
-                            email_found = str(value)
-                            break
+                            if value and str(value).strip() != "":
+                                email_found = str(value)
+                                break
             except Exception:
                 pass
 
