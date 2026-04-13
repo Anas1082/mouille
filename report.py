@@ -87,6 +87,24 @@ def generate_unique(DATABASE, cpm, date_range=None):
     doc.change_document_style("firstpage")
     doc.add_color(name="lightgray", model="gray", description="0.80")
 
+    conex = connect(DATABASE)
+    cursor = conex.cursor()
+    try:
+        total_clicks = cursor.execute("SELECT clicks FROM socialfish WHERE id = 1").fetchone()[0]
+        total_creds = cursor.execute("SELECT COUNT(*) FROM creds").fetchone()[0]
+        not_picked_up = total_clicks - total_creds
+    except Exception:
+        total_clicks = 0
+        not_picked_up = 0
+
+    doc.append(LargeText(bold('Résumé des statistiques')))
+    doc.append(LineBreak())
+    doc.append(f"Clics totaux : {total_clicks}")
+    doc.append(LineBreak())
+    doc.append(f"Visiteurs non capturés : {not_picked_up}")
+    doc.append(LineBreak())
+    doc.append(LineBreak())
+
     with doc.create(LongTabu("X[15l]", row_height=1.8)) as data_table:
         data_table.add_row(["Informations de capture\n"], mapper=bold, color="lightgray")
         data_table.add_empty_row()
